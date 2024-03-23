@@ -6,6 +6,7 @@ if (any(installed_libs == F)) {
 invisible(lapply(libs, library, character.only = T))
 
 
+
 ### Set up github
 
 # usethis::use_git_config(user.name="Codo-der-Dritte", user.email="h11706050@s.wu.ac.at")
@@ -34,11 +35,21 @@ stop_german <- data.frame(word = stopwords::stopwords("de"), stringsAsFactors = 
 
 dtt <- dtt %>%
   unnest_tokens(word, text) %>%
-  anti_join(stop_german)
+  anti_join(stop_german, by = join_by(word))
+
+
+dtt <- dtt %>%
+  filter(!(str_detect(word, "^\\d+$") |
+             str_length(word) == 1))
+
+probs <- dtt %>%
+  group_by(parties) %>%
+  count(word)
+
 
 dtt %>%
-  filter(!str_detect(word, "\\D"),
-       str_length(word) != 1)
+  filter(!(str_detect(word, "^\\d+$") |
+       str_length(word) == 1))
 
 
 
