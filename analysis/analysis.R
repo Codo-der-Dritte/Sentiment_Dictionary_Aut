@@ -16,6 +16,9 @@ invisible(lapply(libs, library, character.only = T))
 ses<- fromJSON("./data/sessions.json")
 per<- fromJSON("./data/persons.json")
 
+
+### Daten in Form bringen
+
 y <- tibble()
 for(i in 1:nrow(ses)){
 x <- tibble(speaker = ses$sections[[i]]$speaker, text=  ses$sections[[i]]$text)
