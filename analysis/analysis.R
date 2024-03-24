@@ -71,22 +71,45 @@ dtt <- dtt %>%
            str_detect(word, "\\b\\d{1,2}\\.(3[2-9]|\\d{3,})\\b")) %>%
   anti_join(stop_german, by = join_by(word))
 
-# Häufigkeiten von worten ausrechnen
+# Häufigkeiten von Worten ausrechnen
 
 probs <- dtt %>%
   mutate(parties = if_else(parties == "BZÖ", list("FPÖ"), parties)) %>%
+  filter(!str_detect(word, "\\d")) %>%
+  filter(!(str_detect(word, "^\\d+$") |
+             str_length(word) < 3) |
+           str_detect(word, "[.,]") |
+           str_detect(word, "[.,][.,]") |
+           str_detect(word, "[.,][.,][.,]") |
+           str_detect(word, "\\b(0?[1-9]|[12][0-9]|3[01])\\.(0?[1-9]|1[0-2])\\.(\\d{4})\\b") |
+           str_detect(word, "\\b\\d{1,3}(,\\d{3})+(\\.\\d+)?\\b") |
+           str_detect(word, "\\b\\d{1,2}\\.(3[2-9]|\\d{3,})\\b")) %>%
   group_by(parties) %>%
   count(word)
 
 probs_abs <- probs %>%
   pivot_wider(names_from = parties, values_from = n) %>%
-  filter(!str_detect(word, "\\d"))
+
 
 probs_p <- probs_abs %>%
   mutate(across(2:7, ~ . / sum(., na.rm = T))) %>%
   filter(rowSums(!is.na(.)) > 0)
 
+kickl <- read.delim("./data/Herbert_Kickl_rede.txt", header = F, col.names = "text")
 
+kickl_tok <- kickl %>%
+  unnest_tokens(output = "word", input = "text") %>%
+  anti_join(stop_german, by = join_by(word))
+
+kickl_abs <- kickl_tok %>%
+  count(word)
+
+kickl_p <- left_join(kickl_abs, probs_p, by = "word") %>%
+  filter(rowSums(!is.na(.)) > 2)
+
+result <- kickl_p %>%
+  mutate(across(3:8, ~ . * 100 * n)) %>%
+  summarise(across(3:8, ~ sum(., na.rm =T)))
 
 
 
