@@ -115,9 +115,7 @@ freq_by_rank %>%
   scale_x_log10() +
   scale_y_log10()
 
-rank_subset <- freq_by_rank %>%
-  filter(rank < 500,
-         rank > 10)
+rank_subset <- freq_by_rank
 
 freq_model <- lm(log10(term_frequency) ~ log10(rank), data = rank_subset)
 
@@ -149,6 +147,20 @@ speaker_tf_idf %>%
   geom_col(show.legend = FALSE) +
   facet_wrap(~name, ncol = 2, scales = "free") +
   labs(x = "tf-idf", y = NULL)
+
+
+
+# Some data cleaning is necessary to remove numbers and less
+# meaningful words. For this a tibble has to be created and then
+# we perform an Antijoin with these words. This should lead to more
+# meaningful outcome.
+
+
+
+
+
+
+
 
 # Rede Herbert Kickl -------------------------------------
 
