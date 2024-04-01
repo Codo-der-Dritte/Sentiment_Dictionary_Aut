@@ -1,6 +1,6 @@
 # This function reduces the number of affilated parties to just one.
 
-reduceR <- function(data, var){
+ reduce_parties <- function(data, var){
   index <- which(sapply(data[[var]], function(x) length(x)>1))
   for(i in 1:length(index)){
     suppressWarnings(data[[var]][index[i]] <- intersect(unlist(data[index[i], var]), rule))
